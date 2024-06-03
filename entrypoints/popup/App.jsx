@@ -32,7 +32,7 @@ function App() {
   
   async function loadData() {
     const backendURL = await storage.getItem('local:backendURL');
-    console.log('loda local url data');
+    console.log('load backend url data');
     if (backendURL) {
       setbackendURLValue(backendURL);
       console.log(backendURL);
