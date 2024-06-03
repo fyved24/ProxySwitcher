@@ -36,6 +36,8 @@ function App() {
     if (backendURL) {
       setbackendURLValue(backendURL);
       console.log(backendURL);
+    } else {
+      settingBackendClicked();
     }
     return backendURL;
   }
@@ -119,7 +121,7 @@ function App() {
   return (
     <>
       {proxyItems}
-      <ListItem ItemIco={PlusOutlined} onClick={()=>{setShowAddToProxy(!showAddToProxy)}} text={'添加代理'} />
+      <ListItem ItemIco={PlusOutlined} onClick={()=>{setShowAddToProxy(!showAddToProxy)}} text={'添加匹配'} />
       {showAddToProxy && 
       <Space.Compact
         style={{
