@@ -19,8 +19,8 @@ function App() {
   
   useEffect(() => {
     const asyncFun = async () => {
-      await loadData();
-      await fetchProxiesData();
+      const backendURL = await loadData()
+      await fetchProxiesData(backendURL);
     };
     asyncFun();
     
@@ -35,7 +35,9 @@ function App() {
     console.log('loda local url data');
     if (backendURL) {
       setbackendURLValue(backendURL);
+      console.log(backendURL);
     }
+    return backendURL;
   }
 
   function fillUrlInput() {
@@ -78,7 +80,7 @@ function App() {
   async function selectProxy(id) {
     console.log(id);
     // 发送切换请求到后端
-    const res = await browser.runtime.sendMessage({op: 'switch', param: id});
+    const res = await browser.runtime.sendMessage({op: 'switch', url: backendURLValue, param: id});
     console.log(res); 
     setProxyList(prevList =>
       prevList.map(item =>
@@ -95,16 +97,16 @@ function App() {
       onClick={()=>{selectProxy(item.id)}}
     />
   );
-  async function fetchProxiesData() {
+  async function fetchProxiesData(backendURL) {
     console.log('fetch proxies');
-    const res = await browser.runtime.sendMessage({op: 'proxies'});
+    const res = await browser.runtime.sendMessage({op: 'proxies', url: backendURL,});
     setProxyList(res.data);
     console.log(proxyList);
   }
 
   async function submitClicked() {
     console.log(matchedURLValue)
-    const res = await browser.runtime.sendMessage({op: 'add', param: matchedURLValue});
+    const res = await browser.runtime.sendMessage({op: 'add', url: backendURLValue, param: matchedURLValue});
     console.log(res); // "pong"
     
   }
