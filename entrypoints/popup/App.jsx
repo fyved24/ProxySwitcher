@@ -12,7 +12,7 @@ import { storage } from 'wxt/storage';
 
 function App() {
   const [showAddToProxy, setShowAddToProxy] = useState(false);
-  const [urlValue, setURLValue] = useState('*.example.com');
+  const [matchedURLValue, setMatchedURLValue] = useState('*.example.com');
   const [showBackendSetting, setShowBackendSetting] = useState(false);
   const [backendURLValue, setbackendURLValue] = useState('http://127.0.0.1:8000');
   const [proxyList, setProxyList] =  useState( []);
@@ -37,18 +37,6 @@ function App() {
       setbackendURLValue(backendURL);
     }
   }
-  async function fetchProxiesData() {
-    console.log('fetch proxies');
-    const res = await browser.runtime.sendMessage('proxies');
-
-    // const newList = [
-    //   { name: "直连", type: "", id: 0 },
-    //   { name: "Proxy1", type: "", select:1, id: 1 },
-    //   { name: "Proxy2", type: "", id: 2 },
-    // ];
-    setProxyList(res.data);
-    console.log(proxyList);
-  }
 
   function fillUrlInput() {
     browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
@@ -57,7 +45,7 @@ function App() {
       console.log(url);
       var cutedUrl = getWildcardDomain(url);
       console.log(cutedUrl);
-      setURLValue(cutedUrl);
+      setMatchedURLValue(cutedUrl);
   
     });
   }
@@ -78,24 +66,20 @@ function App() {
       return null;
     }
   }
-  async function submitClicked() {
-    console.log(333)
-    const res = await browser.runtime.sendMessage('ping');
-    console.log(res); // "pong"
-    
-  }
-  async function settingBackendClicked() {
-    console.log('设置后端地址');
-    console.log(backendURLValue);
-    await storage.setItem('local:backendURL', backendURLValue);
-  }
   function backendURLChanged(event) {
     const val = event.target.value;
     setbackendURLValue(val);
   }
+  function matchedURLChanged(event) {
+    const val = event.target.value;
+    setMatchedURLValue(val);
+  }
 
-  function selectProxy(id) {
+  async function selectProxy(id) {
     console.log(id);
+    // 发送切换请求到后端
+    const res = await browser.runtime.sendMessage({op: 'switch', param: id});
+    console.log(res); 
     setProxyList(prevList =>
       prevList.map(item =>
         item.id === id ? { ...item, select: 1 } : { ...item, select: 0 }
@@ -111,6 +95,24 @@ function App() {
       onClick={()=>{selectProxy(item.id)}}
     />
   );
+  async function fetchProxiesData() {
+    console.log('fetch proxies');
+    const res = await browser.runtime.sendMessage({op: 'proxies'});
+    setProxyList(res.data);
+    console.log(proxyList);
+  }
+
+  async function submitClicked() {
+    console.log(matchedURLValue)
+    const res = await browser.runtime.sendMessage({op: 'add', param: matchedURLValue});
+    console.log(res); // "pong"
+    
+  }
+  async function settingBackendClicked() {
+    console.log('设置后端地址');
+    console.log(backendURLValue);
+    await storage.setItem('local:backendURL', backendURLValue);
+  }
 
   return (
     <>
@@ -122,7 +124,7 @@ function App() {
           width: '100%',
         }}
       >
-        <Input defaultValue={urlValue} />
+        <Input defaultValue={matchedURLValue} onChange={matchedURLChanged} />
         <Button type="primary" style={{
           width: '20%',
         }} icon={<PlusOutlined />} onClick={submitClicked} /> 
