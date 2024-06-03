@@ -16,9 +16,6 @@ function App() {
   const [showBackendSetting, setShowBackendSetting] = useState(false);
   const [backendURLValue, setbackendURLValue] = useState('http://127.0.0.1:8000');
   const [proxyList, setProxyList] =  useState( []);
-  const systemProxy = [
-    {  name: "直连", type: "", id: 0 },
-  ]
   
   useEffect(() => {
     const asyncFun = async () => {
@@ -42,12 +39,14 @@ function App() {
   }
   async function fetchProxiesData() {
     console.log('fetch proxies');
+    const res = await browser.runtime.sendMessage('proxies');
 
-    const newList = [
-      { name: "Proxy1", type: "", id: 1 },
-      { name: "Proxy2", type: "", id: 2 },
-    ];
-    setProxyList([...systemProxy, ...newList]);
+    // const newList = [
+    //   { name: "直连", type: "", id: 0 },
+    //   { name: "Proxy1", type: "", select:1, id: 1 },
+    //   { name: "Proxy2", type: "", id: 2 },
+    // ];
+    setProxyList(res.data);
     console.log(proxyList);
   }
 
