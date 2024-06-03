@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { Button } from 'antd';
 
-export function ListItem({ ItemIco,text,onClick }) {
-  const [count, setCount] = useState(0);
-  const [show, setShow] = useState(false);
+export function ListItem({ ItemIco,text,type,onClick }) {
   return (
-    <Button  block onClick={onClick} icon= {ItemIco && <ItemIco />}>
+    <Button block onClick={onClick} type={type} icon= {ItemIco && <ItemIco />}>
       {text}
     </Button>
   );
