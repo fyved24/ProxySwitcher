@@ -9,18 +9,33 @@ import { SwapOutlined,
   CheckOutlined
 } from '@ant-design/icons';
 import { Input,Button,Space } from 'antd';
+import { storage } from 'wxt/storage';
 
 function App() {
   const [showAddToProxy, setShowAddToProxy] = useState(false);
   const [urlValue, setURLValue] = useState('*.example.com');
   const [showBackendSetting, setShowBackendSetting] = useState(false);
   const [backendURLValue, setbackendURLValue] = useState('http://127.0.0.1:8000');
-
-
+  useEffect(() => {
+    loadData();
+  }, []);
 
   useEffect(() => {
     fillUrlInput();
-  });
+  }, []);
+
+  useEffect(() => {
+    console.log('backendURLValue changed:', backendURLValue);
+  }, [backendURLValue]);
+  
+  async function loadData() {
+    console.log('loadData');
+    const backendURL = await storage.getItem('local:backendURL');
+    console.log(backendURL);
+    if (backendURL) {
+      setbackendURLValue(backendURL);
+    }
+  }
   function fillUrlInput() {
     browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
       const activeTab = tabs[0];
@@ -61,10 +76,17 @@ function App() {
     
   }
   async function settingBackendClicked() {
-    console.log(333)
-    const res = await browser.runtime.sendMessage('ping');
-    console.log(res); // "pong"
+    console.log(backendURLValue);
+    await storage.setItem('local:backendURL', backendURLValue);
+  }
+  function backendURLChanged(event) {
+    console.log('backendURLChanged');
+    const val = event.target.value;
+    setbackendURLValue(val);
+    console.log(val);
+    console.log(backendURLValue);
     
+
   }
 
   return (
@@ -78,7 +100,7 @@ function App() {
           width: '100%',
         }}
       >
-        <Input defaultValue='*.example.com' value={urlValue} />
+        <Input defaultValue={urlValue} />
         <Button type="primary" style={{
           width: '20%',
         }} icon={<PlusOutlined />} onClick={submitClicked} /> 
@@ -91,7 +113,7 @@ function App() {
           width: '100%',
         }}
       >
-        <Input defaultValue='http://127.0.0.1:8000' value={backendURLValue} />
+        <Input defaultValue={backendURLValue} onChange={backendURLChanged} />
         <Button type="primary" style={{
           width: '20%',
         }} icon={ <CheckOutlined />} onClick={settingBackendClicked} /> 
