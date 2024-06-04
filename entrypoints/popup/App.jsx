@@ -29,7 +29,11 @@ function App() {
   useEffect(() => {
     fillUrlInput();
   }, []);
-  
+  const unwatch = storage.watch('local:backendURL', (newURL, oldURL) => {
+    console.log('URL changed:', { newURL, oldURL });
+    fetchProxiesData(newURL);
+  });
+
   async function loadData() {
     const backendURL = await storage.getItem('local:backendURL');
     console.log('load backend url data');
