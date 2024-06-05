@@ -9,3 +9,7 @@ xcrun safari-web-extension-converter safari-mv2  --app-name "ProxySwitcher" --ma
 ```bash
 sudo networksetup -setautoproxyurl Wi-Fi http://127.0.0.1:4000/rules.pac
 ```
+隔壁PAC代理
+```bash
+sudo networksetup -setautoproxystate "Wi-Fi" off
+```
