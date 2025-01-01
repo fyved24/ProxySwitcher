@@ -10,6 +10,10 @@ export default defineBackground(() => {
           .then((data) => {
             console.log(data);
             sendResponse(data);
+          })
+          .catch((error) => {
+            console.error('获取代理列表失败:', error);
+            sendResponse({data: []});
           });
         break;
       case 'add':
